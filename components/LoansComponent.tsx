@@ -152,7 +152,7 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
     setMembers(members.map(m => m.id === borrowerId ? { ...m, activeLoanId: newLoan.id } : m));
     
     // Create Transactions: Disbursal AND Fee
-    const newTransactions = [
+    const newTransactions: Transaction[] = [
         { 
             id: Math.random().toString(36).substr(2, 9), 
             memberId: borrowerId, 
@@ -161,7 +161,8 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
             date: new Date().toISOString(), 
             description: 'Loan Disbursal',
             paymentMethod: disbursalMethod,
-            receivedBy: issuedBy
+            receivedBy: issuedBy,
+            status: 'completed'
         },
         {
             id: Math.random().toString(36).substr(2, 9),
@@ -171,7 +172,8 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
             date: new Date().toISOString(),
             description: feeType === 'capitalized' 
                 ? `Application Fee (${term} Mo) - Added to Principal` 
-                : `Application Fee (${term} Mo) - Paid Upfront`
+                : `Application Fee (${term} Mo) - Paid Upfront`,
+            status: 'completed'
         },
         ...transactions
     ];
@@ -239,7 +241,8 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
              type: 'FEE',
              amount: 5.00,
              date: new Date().toISOString(),
-             description: 'Late Fee: Missed Payment Due Date'
+             description: 'Late Fee: Missed Payment Due Date',
+             status: 'completed'
          });
      }
 
@@ -274,12 +277,14 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
          date: new Date().toISOString(), 
          description: 'Loan Repayment',
          paymentMethod: method,
-         receivedBy: receiver
+         receivedBy: receiver,
+         status: 'completed'
      });
      
      setTransactions(newTransactions);
 
      if (newStatus === 'PAID') {
+       // Update member: clear active loan, set last paid date
        setMembers(members.map(m => m.id === loan.borrowerId ? { ...m, activeLoanId: null, lastLoanPaidDate: new Date().toISOString() } : m));
        notify("Loan fully paid off!", "success");
      } else {

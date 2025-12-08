@@ -69,7 +69,8 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
       date: new Date().toISOString(),
       description: 'Monthly Contribution',
       paymentMethod,
-      receivedBy
+      receivedBy,
+      status: 'completed'
     };
     setTransactions([newTransaction, ...transactions]);
 
@@ -179,7 +180,7 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
                       <option value="Mangpi">Mangpi</option>
                       <option value="Muan">Muan</option>
                       <option value="John Tuang">John Tuang</option>
-                      <option value="Bank">Bank</option>
+                      <option value="Admin">Admin</option>
                   </select>
               </div>
           </div>

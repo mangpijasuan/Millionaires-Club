@@ -10,6 +10,7 @@ export interface Member {
   totalContribution: number;
   activeLoanId: string | null;
   lastLoanPaidDate: string | null;
+  autoPay?: boolean;
 }
 
 export interface Loan {
@@ -33,6 +34,7 @@ export interface Transaction {
   description: string;
   paymentMethod?: string;
   receivedBy?: string;
+  status?: 'completed' | 'pending' | 'failed';
 }
 
 export interface CommunicationLog {
