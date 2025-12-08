@@ -8,9 +8,10 @@ interface ContributionsProps {
   transactions: Transaction[];
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
   notify: (msg: string, type?: 'success' | 'error' | 'info') => void;
+  isDark?: boolean;
 }
 
-const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMembers, transactions, setTransactions, notify }) => {
+const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMembers, transactions, setTransactions, notify, isDark = false }) => {
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const [amount, setAmount] = useState('');
   
@@ -22,6 +23,13 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
   const [searchTerm, setSearchTerm] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Theme classes
+  const cardClass = isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
+  const inputClass = isDark ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400';
+  const textPrimary = isDark ? 'text-white' : 'text-slate-800';
+  const textSecondary = isDark ? 'text-slate-400' : 'text-slate-500';
+  const bgHeader = isDark ? 'bg-slate-900' : 'bg-slate-50';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -91,19 +99,19 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in">
       {/* Entry Form */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-fit">
-        <h3 className="font-bold text-lg mb-4 text-slate-800 flex items-center gap-2">
+      <div className={`p-6 rounded-2xl shadow-sm border h-fit ${cardClass}`}>
+        <h3 className={`font-bold text-lg mb-4 ${textPrimary} flex items-center gap-2`}>
           <Plus size={20} className="text-emerald-600"/> Record Contribution
         </h3>
         <form onSubmit={handleAddContribution} className="space-y-4">
           
           {/* Searchable Member Select */}
           <div className="relative" ref={dropdownRef}>
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Select Member</label>
+            <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Select Member</label>
             <div className="relative">
               <input 
                 type="text"
-                className={`w-full pl-10 pr-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 ${!selectedMemberId ? 'border-slate-200' : 'border-emerald-500 bg-emerald-50/30'}`}
+                className={`w-full pl-10 pr-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 ${inputClass} ${!selectedMemberId ? '' : 'border-emerald-500'}`}
                 placeholder="Search name or ID..."
                 value={searchTerm}
                 onChange={(e) => {
@@ -113,39 +121,39 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
                 }}
                 onFocus={() => setIsDropdownOpen(true)}
               />
-              <Search className="absolute left-3 top-3.5 text-slate-400" size={18} />
-              <ChevronDown className={`absolute right-3 top-3.5 text-slate-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} size={18} />
+              <Search className={`absolute left-3 top-3.5 ${textSecondary}`} size={18} />
+              <ChevronDown className={`absolute right-3 top-3.5 ${textSecondary} transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} size={18} />
             </div>
 
             {/* Dropdown List */}
             {isDropdownOpen && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+              <div className={`absolute z-20 w-full mt-1 border rounded-xl shadow-xl max-h-60 overflow-y-auto ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
                 {filteredMembers.length > 0 ? (
                   filteredMembers.map(m => (
                     <div 
                       key={m.id} 
-                      className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex justify-between items-center border-b border-slate-50 last:border-0"
+                      className={`px-4 py-3 cursor-pointer flex justify-between items-center border-b last:border-0 ${isDark ? 'hover:bg-slate-700 border-slate-700' : 'hover:bg-slate-50 border-slate-50'}`}
                       onClick={() => handleSelectMember(m)}
                     >
                       <div>
-                        <div className="font-bold text-slate-700">{m.name}</div>
-                        <div className="text-xs text-slate-400">{m.id}</div>
+                        <div className={`font-bold ${isDark ? 'text-slate-200' : 'text-slate-700'}`}>{m.name}</div>
+                        <div className={`text-xs ${textSecondary}`}>{m.id}</div>
                       </div>
                       {selectedMemberId === m.id && <Check size={16} className="text-emerald-600" />}
                     </div>
                   ))
                 ) : (
-                  <div className="p-4 text-center text-slate-400 text-sm">No active members found.</div>
+                  <div className={`p-4 text-center ${textSecondary} text-sm`}>No active members found.</div>
                 )}
               </div>
             )}
           </div>
 
           <div>
-             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Amount ($)</label>
+             <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Amount ($)</label>
              <input 
                type="number" 
-               className="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+               className={`w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 ${inputClass}`}
                placeholder="0.00"
                value={amount}
                onChange={(e) => setAmount(e.target.value)}
@@ -155,9 +163,9 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
 
           <div className="grid grid-cols-2 gap-4">
               <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Payment Type</label>
+                  <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Payment Type</label>
                   <select 
-                    className="w-full p-3 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className={`w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 ${inputClass}`}
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                   >
@@ -169,9 +177,9 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
                   </select>
               </div>
               <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Received By</label>
+                  <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Received By</label>
                   <select 
-                    className="w-full p-3 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className={`w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 ${inputClass}`}
                     value={receivedBy}
                     onChange={(e) => setReceivedBy(e.target.value)}
                   >
@@ -185,23 +193,23 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
               </div>
           </div>
 
-          <button type="submit" className="w-full py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200">
+          <button type="submit" className={`w-full py-3 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-colors ${isDark ? 'shadow-lg shadow-emerald-900/30' : 'shadow-lg shadow-emerald-200'}`}>
             Confirm Payment
           </button>
         </form>
       </div>
 
       {/* History List */}
-      <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+      <div className={`lg:col-span-2 p-6 rounded-2xl shadow-sm border ${cardClass}`}>
         <div className="flex justify-between items-center mb-6">
-          <h3 className="font-bold text-lg text-slate-800">Recent Contributions</h3>
-          <button className="text-slate-500 hover:text-slate-800 flex items-center gap-1 text-sm">
+          <h3 className={`font-bold text-lg ${textPrimary}`}>Recent Contributions</h3>
+          <button className={`${textSecondary} hover:${textPrimary} flex items-center gap-1 text-sm`}>
             <Download size={16}/> Export CSV
           </button>
         </div>
         <div className="overflow-hidden">
           <table className="w-full text-sm text-left">
-            <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+            <thead className={`${bgHeader} ${textSecondary} font-semibold border-b ${isDark ? 'border-slate-700' : 'border-slate-100'}`}>
               <tr>
                 <th className="px-4 py-3">Date</th>
                 <th className="px-4 py-3">Member</th>
@@ -209,24 +217,24 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
                 <th className="px-4 py-3 text-right">Amount</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
               {recentContributions.map(t => {
                 const member = members.find(m => m.id === t.memberId);
                 return (
-                  <tr key={t.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 text-slate-500">
+                  <tr key={t.id} className={`${isDark ? 'hover:bg-slate-700/50' : 'hover:bg-slate-50'}`}>
+                    <td className={`px-4 py-3 ${textSecondary}`}>
                         {new Date(t.date).toLocaleDateString()}
-                        <div className="text-[10px] text-slate-400">Rec: {t.receivedBy || 'System'}</div>
+                        <div className={`text-[10px] ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>Rec: {t.receivedBy || 'System'}</div>
                     </td>
-                    <td className="px-4 py-3 font-medium text-slate-800">{member?.name || t.memberId}</td>
-                    <td className="px-4 py-3 text-slate-600">{t.paymentMethod || 'N/A'}</td>
+                    <td className={`px-4 py-3 font-medium ${textPrimary}`}>{member?.name || t.memberId}</td>
+                    <td className={`px-4 py-3 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{t.paymentMethod || 'N/A'}</td>
                     <td className="px-4 py-3 text-right font-bold text-emerald-600">+${t.amount.toLocaleString()}</td>
                   </tr>
                 );
               })}
               {recentContributions.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-slate-400">No contributions recorded recently.</td>
+                  <td colSpan={4} className={`px-4 py-8 text-center ${textSecondary}`}>No contributions recorded recently.</td>
                 </tr>
               )}
             </tbody>

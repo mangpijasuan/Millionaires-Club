@@ -8,9 +8,10 @@ interface MembersListProps {
   handleAddMember: (e: React.FormEvent) => void;
   handleDeleteMember: (id: string) => void;
   setShowBatchUpload: (show: boolean) => void;
+  isDark?: boolean;
 }
 
-const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingMember, handleAddMember, handleDeleteMember, setShowBatchUpload }) => {
+const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingMember, handleAddMember, handleDeleteMember, setShowBatchUpload, isDark = false }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
   
@@ -18,6 +19,13 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
   const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Inactive'>('All');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  // Theme classes
+  const cardClass = isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
+  const inputClass = isDark ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400';
+  const textPrimary = isDark ? 'text-white' : 'text-slate-800';
+  const textSecondary = isDark ? 'text-slate-400' : 'text-slate-500';
+  const bgHeader = isDark ? 'bg-slate-900' : 'bg-slate-50';
 
   const filteredMembers = members.filter(m => {
     const matchesSearch = m.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -52,11 +60,11 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
         {/* Top Controls: Search + Action Buttons */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-3 text-slate-400" size={18} />
+            <Search className={`absolute left-3 top-3 ${textSecondary}`} size={18} />
             <input 
               type="text" 
               placeholder="Search by name or ID..." 
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm"
+              className={`w-full pl-10 pr-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm border ${inputClass}`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -64,7 +72,7 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
           <div className="flex gap-2 w-full md:w-auto">
             <button 
               onClick={() => setShowBatchUpload(true)}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl font-medium hover:bg-slate-50 transition-colors shadow-sm"
+              className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 border rounded-xl font-medium transition-colors shadow-sm ${isDark ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
             >
               <Upload size={18} /> <span className="hidden sm:inline">Batch Upload</span>
             </button>
@@ -78,8 +86,8 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
         </div>
 
         {/* Filter Toolbar */}
-        <div className="flex flex-wrap gap-4 items-center bg-slate-50 p-3 rounded-xl border border-slate-200">
-            <div className="flex items-center gap-2 text-slate-500">
+        <div className={`flex flex-wrap gap-4 items-center p-3 rounded-xl border ${isDark ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+            <div className={`flex items-center gap-2 ${textSecondary}`}>
                 <Filter size={16} />
                 <span className="text-xs font-bold uppercase">Filters:</span>
             </div>
@@ -88,7 +96,7 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
                 <select 
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value as any)}
-                    className="p-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
+                    className={`p-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer ${inputClass}`}
                 >
                     <option value="All">All Status</option>
                     <option value="Active">Active</option>
@@ -96,20 +104,20 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
                 </select>
             </div>
 
-            <div className="flex items-center gap-2 bg-white px-2 py-1 rounded-lg border border-slate-200">
-                <span className="text-xs text-slate-400">Joined:</span>
+            <div className={`flex items-center gap-2 px-2 py-1 rounded-lg border ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
+                <span className={`text-xs ${textSecondary}`}>Joined:</span>
                 <input 
                     type="date" 
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="text-xs p-1 focus:outline-none text-slate-700"
+                    className={`text-xs p-1 focus:outline-none ${isDark ? 'bg-slate-800 text-white' : 'text-slate-700'}`}
                 />
-                <span className="text-slate-300">-</span>
+                <span className={isDark ? 'text-slate-600' : 'text-slate-300'}>-</span>
                 <input 
                     type="date" 
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="text-xs p-1 focus:outline-none text-slate-700"
+                    className={`text-xs p-1 focus:outline-none ${isDark ? 'bg-slate-800 text-white' : 'text-slate-700'}`}
                 />
             </div>
             
@@ -125,27 +133,27 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
       </div>
 
       {showAddForm && (
-        <div className="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm animate-in slide-in-from-top-4">
-          <h3 className="font-bold text-lg mb-4 text-slate-800">New Member Registration</h3>
+        <div className={`p-6 rounded-2xl border shadow-sm animate-in slide-in-from-top-4 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-emerald-100'}`}>
+          <h3 className={`font-bold text-lg mb-4 ${textPrimary}`}>New Member Registration</h3>
           <form onSubmit={(e) => { handleAddMember(e); setShowAddForm(false); }} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <input name="name" placeholder="Full Name" className="p-3 border rounded-lg" required />
-             <input name="mc_id" placeholder="Member ID (Optional)" className="p-3 border rounded-lg" />
-             <input name="email" type="email" placeholder="Email Address" className="p-3 border rounded-lg" />
-             <input name="phone" placeholder="Phone Number" className="p-3 border rounded-lg" />
-             <input name="beneficiary" placeholder="Beneficiary Name" className="p-3 border rounded-lg" />
-             <input name="address" placeholder="Address" className="p-3 border rounded-lg" />
+             <input name="name" placeholder="Full Name" className={`p-3 border rounded-lg ${inputClass}`} required />
+             <input name="mc_id" placeholder="Member ID (Optional)" className={`p-3 border rounded-lg ${inputClass}`} />
+             <input name="email" type="email" placeholder="Email Address" className={`p-3 border rounded-lg ${inputClass}`} />
+             <input name="phone" placeholder="Phone Number" className={`p-3 border rounded-lg ${inputClass}`} />
+             <input name="beneficiary" placeholder="Beneficiary Name" className={`p-3 border rounded-lg ${inputClass}`} />
+             <input name="address" placeholder="Address" className={`p-3 border rounded-lg ${inputClass}`} />
              <div className="md:col-span-2 flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg">Cancel</button>
+                <button type="button" onClick={() => setShowAddForm(false)} className={`px-4 py-2 rounded-lg ${isDark ? 'text-slate-400 hover:bg-slate-700' : 'text-slate-500 hover:bg-slate-100'}`}>Cancel</button>
                 <button type="submit" className="px-6 py-2 bg-emerald-600 text-white rounded-lg font-bold">Register Member</button>
              </div>
           </form>
         </div>
       )}
 
-      <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div className={`border rounded-2xl shadow-sm overflow-hidden ${cardClass}`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider">
+            <thead className={`border-b font-semibold uppercase tracking-wider ${isDark ? 'bg-slate-900 border-slate-700 text-slate-400' : 'bg-slate-50 border-slate-200 text-slate-500'}`}>
               <tr>
                 <th className="px-6 py-4">ID</th>
                 <th className="px-6 py-4">Legal Name</th>
@@ -157,49 +165,51 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
               {filteredMembers.map((member) => (
-                <tr key={member.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-mono text-slate-500">{member.id}</td>
+                <tr key={member.id} className={`transition-colors ${isDark ? 'hover:bg-slate-700/50' : 'hover:bg-slate-50/50'}`}>
+                  <td className={`px-6 py-4 font-mono ${textSecondary}`}>{member.id}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${isDark ? 'bg-slate-700 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
                         {member.name.charAt(0)}
                       </div>
-                      <span className="font-medium text-slate-800">{member.name}</span>
+                      <span className={`font-medium ${textPrimary}`}>{member.name}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-slate-600 italic">{member.nickname || '-'}</span>
+                    <span className={`italic ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{member.nickname || '-'}</span>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${
-                      member.accountStatus === 'Active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                      member.accountStatus === 'Active' 
+                        ? (isDark ? 'bg-emerald-900/50 text-emerald-400' : 'bg-emerald-100 text-emerald-700')
+                        : (isDark ? 'bg-slate-700 text-slate-400' : 'bg-slate-100 text-slate-500')
                     }`}>
                       {member.accountStatus === 'Active' && <UserCheck size={12}/>}
                       {member.accountStatus}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-xs">
-                    <div className="text-slate-700">{member.email}</div>
-                    <div className="text-slate-500">{member.phone || '-'}</div>
+                    <div className={isDark ? 'text-slate-300' : 'text-slate-700'}>{member.email}</div>
+                    <div className={textSecondary}>{member.phone || '-'}</div>
                   </td>
-                  <td className="px-6 py-4 font-medium text-slate-700">
+                  <td className={`px-6 py-4 font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>
                     ${member.totalContribution.toLocaleString()}
                   </td>
-                  <td className="px-6 py-4 text-slate-500">{member.joinDate}</td>
+                  <td className={`px-6 py-4 ${textSecondary}`}>{member.joinDate}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
                         <button 
                           onClick={() => setEditingMember(member)}
-                          className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-700 transition-colors"
+                          className={`p-2 rounded-full transition-colors ${isDark ? 'text-slate-500 hover:bg-slate-700 hover:text-slate-300' : 'text-slate-400 hover:bg-slate-200 hover:text-slate-700'}`}
                           title="Edit Member"
                         >
                           <MoreVertical size={18} />
                         </button>
                         <button 
                           onClick={() => handleDeleteMember(member.id)}
-                          className="p-2 hover:bg-red-50 rounded-full text-slate-400 hover:text-red-600 transition-colors"
+                          className={`p-2 rounded-full transition-colors ${isDark ? 'text-slate-500 hover:bg-red-900/50 hover:text-red-400' : 'text-slate-400 hover:bg-red-50 hover:text-red-600'}`}
                           title="Delete Member"
                         >
                           <Trash2 size={18} />
@@ -212,7 +222,7 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
           </table>
         </div>
         {filteredMembers.length === 0 && (
-          <div className="p-8 text-center text-slate-400">No members found matching your criteria.</div>
+          <div className={`p-8 text-center ${textSecondary}`}>No members found matching your criteria.</div>
         )}
       </div>
     </div>

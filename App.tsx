@@ -972,7 +972,14 @@ export default function App() {
     }
   };
 
-  const SystemView = () => {
+  const SystemView = ({ isDark: sysDark }: { isDark?: boolean }) => {
+    const sysIsDark = sysDark || false;
+    const cardClass = sysIsDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
+    const inputClass = sysIsDark ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900';
+    const textPrimary = sysIsDark ? 'text-white' : 'text-slate-800';
+    const textSecondary = sysIsDark ? 'text-slate-400' : 'text-slate-500';
+    const bgHeader = sysIsDark ? 'bg-slate-900' : 'bg-slate-50';
+    
     const dataSize = new Blob([JSON.stringify({ members, loans, transactions })]).size;
     const dataSizeKB = (dataSize / 1024).toFixed(2);
     const lastSync = StorageService.load(STORAGE_KEYS.LAST_SYNC, null);
@@ -1166,22 +1173,22 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                  <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-2"><Clock size={20} className="text-purple-500"/> Task Automation</h3>
+              <div className={`p-6 rounded-2xl shadow-sm border ${cardClass}`}>
+                  <h3 className={`font-bold ${textPrimary} mb-2 flex items-center gap-2`}><Clock size={20} className="text-purple-500"/> Task Automation</h3>
                   <div className="space-y-4 mt-4">
-                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                          <div><div className="font-bold text-slate-700 text-sm">Nightly Renewal Check</div></div>
+                      <div className={`flex items-center justify-between p-4 rounded-xl border ${sysIsDark ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-100'}`}>
+                          <div><div className={`font-bold text-sm ${sysIsDark ? 'text-slate-300' : 'text-slate-700'}`}>Nightly Renewal Check</div></div>
                           <button onClick={handleRunAutomation} className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700">Run Now</button>
                       </div>
                   </div>
               </div>
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                  <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-2"><Activity size={20} className="text-emerald-500"/> System Health</h3>
+              <div className={`p-6 rounded-2xl shadow-sm border ${cardClass}`}>
+                  <h3 className={`font-bold ${textPrimary} mb-2 flex items-center gap-2`}><Activity size={20} className="text-emerald-500"/> System Health</h3>
                   <div className="space-y-3 mt-4">
-                      <div className="flex items-center gap-2 p-3 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium">
+                      <div className={`flex items-center gap-2 p-3 rounded-lg text-sm font-medium ${sysIsDark ? 'bg-emerald-900/30 text-emerald-400' : 'bg-emerald-50 text-emerald-700'}`}>
                           <CheckCircle size={16}/> All systems operational
                       </div>
-                      <div className="text-xs text-slate-500 space-y-1">
+                      <div className={`text-xs ${textSecondary} space-y-1`}>
                           <div className="flex justify-between"><span>Data Size:</span><span className="font-mono font-bold">{dataSizeKB} KB</span></div>
                           <div className="flex justify-between"><span>Members:</span><span className="font-bold">{members.length}</span></div>
                           <div className="flex justify-between"><span>Active Loans:</span><span className="font-bold">{loans.filter(l => l.status === 'ACTIVE').length}</span></div>
@@ -1192,27 +1199,27 @@ export default function App() {
           </div>
 
           {/* Data Management */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-              <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <div className={`p-6 rounded-2xl shadow-sm border ${cardClass}`}>
+              <h3 className={`font-bold ${textPrimary} mb-4 flex items-center gap-2`}>
                   <Download size={20} className="text-blue-500"/> Data Management
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <button 
                       onClick={handleExportData}
-                      className="flex flex-col items-center gap-2 p-4 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 rounded-xl transition-all group"
+                      className={`flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all group ${sysIsDark ? 'bg-blue-900/30 hover:bg-blue-900/50 border-blue-800' : 'bg-blue-50 hover:bg-blue-100 border-blue-200'}`}
                   >
                       <Download size={24} className="text-blue-600 group-hover:scale-110 transition-transform"/>
                       <div className="text-center">
-                          <div className="font-bold text-blue-900 text-sm">Export Backup</div>
-                          <div className="text-xs text-blue-600 mt-1">Download all data as JSON</div>
+                          <div className={`font-bold text-sm ${sysIsDark ? 'text-blue-400' : 'text-blue-900'}`}>Export Backup</div>
+                          <div className={`text-xs mt-1 ${sysIsDark ? 'text-blue-500' : 'text-blue-600'}`}>Download all data as JSON</div>
                       </div>
                   </button>
 
-                  <label className="flex flex-col items-center gap-2 p-4 bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-200 rounded-xl transition-all cursor-pointer group">
+                  <label className={`flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all cursor-pointer group ${sysIsDark ? 'bg-emerald-900/30 hover:bg-emerald-900/50 border-emerald-800' : 'bg-emerald-50 hover:bg-emerald-100 border-emerald-200'}`}>
                       <Upload size={24} className="text-emerald-600 group-hover:scale-110 transition-transform"/>
                       <div className="text-center">
-                          <div className="font-bold text-emerald-900 text-sm">Import Backup</div>
-                          <div className="text-xs text-emerald-600 mt-1">Restore from JSON file</div>
+                          <div className={`font-bold text-sm ${sysIsDark ? 'text-emerald-400' : 'text-emerald-900'}`}>Import Backup</div>
+                          <div className={`text-xs mt-1 ${sysIsDark ? 'text-emerald-500' : 'text-emerald-600'}`}>Restore from JSON file</div>
                       </div>
                       <input 
                           type="file" 
@@ -1224,23 +1231,23 @@ export default function App() {
 
                   <button 
                       onClick={handleClearAllData}
-                      className="flex flex-col items-center gap-2 p-4 bg-red-50 hover:bg-red-100 border-2 border-red-200 rounded-xl transition-all group"
+                      className={`flex flex-col items-center gap-2 p-4 border-2 rounded-xl transition-all group ${sysIsDark ? 'bg-red-900/30 hover:bg-red-900/50 border-red-800' : 'bg-red-50 hover:bg-red-100 border-red-200'}`}
                   >
                       <Trash2 size={24} className="text-red-600 group-hover:scale-110 transition-transform"/>
                       <div className="text-center">
-                          <div className="font-bold text-red-900 text-sm">Clear All Data</div>
-                          <div className="text-xs text-red-600 mt-1">Reset to defaults</div>
+                          <div className={`font-bold text-sm ${sysIsDark ? 'text-red-400' : 'text-red-900'}`}>Clear All Data</div>
+                          <div className={`text-xs mt-1 ${sysIsDark ? 'text-red-500' : 'text-red-600'}`}>Reset to defaults</div>
                       </div>
                   </button>
               </div>
               
-              <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                  <div className="flex items-start gap-2 text-xs text-slate-600">
+              <div className={`mt-4 p-3 rounded-lg border ${sysIsDark ? 'bg-slate-900 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className={`flex items-start gap-2 text-xs ${sysIsDark ? 'text-slate-400' : 'text-slate-600'}`}>
                       <AlertCircle size={14} className="mt-0.5 flex-shrink-0"/>
                       <div>
                           <strong>Data Storage:</strong> All data is stored locally in your browser's LocalStorage. 
                           Export regular backups to prevent data loss. Data persists across browser sessions.
-                          {lastSync && <div className="mt-1 text-slate-500">Last saved: {formatDateTime(lastSync)}</div>}
+                          {lastSync && <div className={`mt-1 ${sysIsDark ? 'text-slate-500' : 'text-slate-500'}`}>Last saved: {formatDateTime(lastSync)}</div>}
                       </div>
                   </div>
               </div>
@@ -1351,7 +1358,7 @@ export default function App() {
 
   // --- ADMIN LAYOUT ---
   return (
-      <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col md:flex-row">
+      <div className={`min-h-screen font-sans flex flex-col md:flex-row ${isDark ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       <MemberDetailPane />
       <BatchUploadModal />
       <LoanCalculatorModal />
@@ -1385,6 +1392,13 @@ export default function App() {
               <NavItem id="system" icon={<Settings size={18} />} label="System & Auto" activeTab={activeTab} setActiveTab={(t: string) => {setActiveTab(t); setIsMobileMenuOpen(false);}} />
           </nav>
           <div className="p-6 border-t border-slate-800 space-y-4">
+              {/* Theme Toggle */}
+              <button 
+                  onClick={toggleTheme}
+                  className="w-full flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-yellow-400 rounded-lg text-xs font-bold transition-colors"
+              >
+                  {isDark ? <><Sun size={14}/> Light Mode</> : <><Moon size={14}/> Dark Mode</>}
+              </button>
               <button onClick={() => setShowCalculator(true)} className="w-full flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 rounded-lg text-xs font-bold transition-colors">
                   <Calculator size={14}/> Loan Calculator
               </button>
@@ -1403,30 +1417,30 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
-          <header className="bg-white border-b border-slate-200 p-4 md:hidden flex justify-between items-center">
-              <h1 className="font-bold text-slate-800">Millionaires Club</h1>
-              <button onClick={() => setIsMobileMenuOpen(true)}><Menu size={24}/></button>
+          <header className={`${isDark ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'} border-b p-4 md:hidden flex justify-between items-center`}>
+              <h1 className={`font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>Millionaires Club</h1>
+              <button onClick={() => setIsMobileMenuOpen(true)} className={isDark ? 'text-white' : 'text-slate-800'}><Menu size={24}/></button>
           </header>
 
           <div className="flex-1 p-4 md:p-10 overflow-y-auto">
               <header className="mb-6 hidden md:flex justify-between items-center">
                 <div>
-                  <h2 className="text-3xl font-bold text-slate-800 capitalize tracking-tight">{activeTab}</h2>
-                  <p className="text-slate-500 mt-1">Manage your community portfolio efficiently.</p>
+                  <h2 className={`text-3xl font-bold capitalize tracking-tight ${isDark ? 'text-white' : 'text-slate-800'}`}>{activeTab}</h2>
+                  <p className={`mt-1 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>Manage your community portfolio efficiently.</p>
                 </div>
-                <div className="flex items-center gap-2 text-xs text-slate-400">
+                <div className={`flex items-center gap-2 text-xs ${isDark ? 'text-slate-500' : 'text-slate-400'}`}>
                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                   <span>Auto-saving to browser</span>
                 </div>
               </header>
               
-              {activeTab === 'dashboard' && <DashboardComponent members={members} loans={loans} transactions={transactions} setActiveTab={setActiveTab} />}
-              {activeTab === 'members' && <MembersListComponent members={members} setEditingMember={setEditingMember} handleAddMember={handleAddMember} handleDeleteMember={handleDeleteMember} setShowBatchUpload={setShowBatchUpload} />}
-              {activeTab === 'contributions' && <ContributionsComponent members={members} setMembers={setMembers} transactions={transactions} setTransactions={setTransactions} notify={notify} />}
-              {activeTab === 'loans' && <LoansComponent members={members} setMembers={setMembers} loans={loans} setLoans={setLoans} transactions={transactions} setTransactions={setTransactions} notify={notify} checkEligibility={checkEligibility} />}
-              {activeTab === 'transactions' && <TransactionHistoryComponent members={members} transactions={transactions} />}
-              {activeTab === 'reports' && <ReportsComponent members={members} loans={loans} transactions={transactions} />}
-              {activeTab === 'system' && <SystemView />}
+              {activeTab === 'dashboard' && <DashboardComponent members={members} loans={loans} transactions={transactions} setActiveTab={setActiveTab} isDark={isDark} />}
+              {activeTab === 'members' && <MembersListComponent members={members} setEditingMember={setEditingMember} handleAddMember={handleAddMember} handleDeleteMember={handleDeleteMember} setShowBatchUpload={setShowBatchUpload} isDark={isDark} />}
+              {activeTab === 'contributions' && <ContributionsComponent members={members} setMembers={setMembers} transactions={transactions} setTransactions={setTransactions} notify={notify} isDark={isDark} />}
+              {activeTab === 'loans' && <LoansComponent members={members} setMembers={setMembers} loans={loans} setLoans={setLoans} transactions={transactions} setTransactions={setTransactions} notify={notify} checkEligibility={checkEligibility} isDark={isDark} />}
+              {activeTab === 'transactions' && <TransactionHistoryComponent members={members} transactions={transactions} isDark={isDark} />}
+              {activeTab === 'reports' && <ReportsComponent members={members} loans={loans} transactions={transactions} isDark={isDark} />}
+              {activeTab === 'system' && <SystemView isDark={isDark} />}
           </div>
       </main>
       </div>

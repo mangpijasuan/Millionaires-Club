@@ -11,14 +11,22 @@ interface LoansProps {
   setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>;
   notify: (msg: string, type?: 'success' | 'error' | 'info') => void;
   checkEligibility: (id: string) => { eligible: boolean; reason?: string; limit?: number };
+  isDark?: boolean;
 }
 
-const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setLoans, transactions, setTransactions, notify, checkEligibility }) => {
+const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setLoans, transactions, setTransactions, notify, checkEligibility, isDark = false }) => {
   const [borrowerId, setBorrowerId] = useState('');
   const [cosignerId, setCosignerId] = useState('');
   const [loanAmount, setLoanAmount] = useState('');
   const [term, setTerm] = useState(12);
   const [feeType, setFeeType] = useState<'upfront' | 'capitalized'>('upfront');
+  
+  // Theme classes
+  const cardClass = isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
+  const inputClass = isDark ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400';
+  const textPrimary = isDark ? 'text-white' : 'text-slate-800';
+  const textSecondary = isDark ? 'text-slate-400' : 'text-slate-500';
+  const bgHeader = isDark ? 'bg-slate-900' : 'bg-slate-50';
   
   // Disbursal Details
   const [disbursalMethod, setDisbursalMethod] = useState('Check');

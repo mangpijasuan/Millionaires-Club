@@ -7,11 +7,19 @@ interface ReportsProps {
   members: Member[];
   loans: Loan[];
   transactions: Transaction[];
+  isDark?: boolean;
 }
 
-const ReportsComponent: React.FC<ReportsProps> = ({ members, loans, transactions }) => {
+const ReportsComponent: React.FC<ReportsProps> = ({ members, loans, transactions, isDark = false }) => {
   const [reportType, setReportType] = useState<'financial' | 'member'>('financial');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  
+  // Theme classes
+  const cardClass = isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
+  const inputClass = isDark ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400';
+  const textPrimary = isDark ? 'text-white' : 'text-slate-800';
+  const textSecondary = isDark ? 'text-slate-400' : 'text-slate-500';
+  const bgHeader = isDark ? 'bg-slate-900' : 'bg-slate-50';
   
   // Member Search State
   const [selectedMemberId, setSelectedMemberId] = useState('');
