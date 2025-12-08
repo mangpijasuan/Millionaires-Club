@@ -10,6 +10,7 @@ import {
 import { Member, Loan, Transaction, CommunicationLog, YearlyContribution } from './types';
 import { CONTRIBUTIONS_DB, INITIAL_MEMBERS, CONTRIBUTION_HISTORY_DB } from './constants';
 import { callGemini } from './services/geminiService';
+import { StorageService, STORAGE_KEYS } from './services/storageService';
 
 // Sub-components
 import DashboardComponent from './components/DashboardComponent';
@@ -223,38 +224,33 @@ export default function App() {
   
   // -- State --
   const [members, setMembers] = useState<Member[]>(() => {
-    const saved = localStorage.getItem('mpm_members');
-    return saved ? JSON.parse(saved) : INITIAL_MEMBERS;
+    return StorageService.load(STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS);
   });
 
   const [loans, setLoans] = useState<Loan[]>(() => {
-    const saved = localStorage.getItem('mpm_loans');
-    return saved ? JSON.parse(saved) : [];
+    return StorageService.load(STORAGE_KEYS.LOANS, []);
   });
 
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    const saved = localStorage.getItem('mpm_transactions');
-    return saved ? JSON.parse(saved) : [];
+    return StorageService.load(STORAGE_KEYS.TRANSACTIONS, []);
   });
 
   const [communicationLogs, setCommunicationLogs] = useState<CommunicationLog[]>(() => {
-      const saved = localStorage.getItem('mpm_comms');
-      return saved ? JSON.parse(saved) : [
+      return StorageService.load(STORAGE_KEYS.COMMUNICATION_LOGS, [
           { id: 'c1', memberId: 'MC-000001', type: 'System', content: 'Renewal Reminder Sent (30 Days)', date: '2025-11-25T10:00:00', direction: 'Outbound' }
-      ];
+      ]);
   });
 
   const [contributionHistory, setContributionHistory] = useState<Record<string, YearlyContribution>>(() => {
-      const saved = localStorage.getItem('mpm_history');
-      return saved ? JSON.parse(saved) : CONTRIBUTION_HISTORY_DB;
+      return StorageService.load('contribution_history', CONTRIBUTION_HISTORY_DB);
   });
 
   // -- Persistence --
-  useEffect(() => { localStorage.setItem('mpm_members', JSON.stringify(members)); }, [members]);
-  useEffect(() => { localStorage.setItem('mpm_loans', JSON.stringify(loans)); }, [loans]);
-  useEffect(() => { localStorage.setItem('mpm_transactions', JSON.stringify(transactions)); }, [transactions]);
-  useEffect(() => { localStorage.setItem('mpm_comms', JSON.stringify(communicationLogs)); }, [communicationLogs]);
-  useEffect(() => { localStorage.setItem('mpm_history', JSON.stringify(contributionHistory)); }, [contributionHistory]);
+  useEffect(() => { StorageService.save(STORAGE_KEYS.MEMBERS, members); }, [members]);
+  useEffect(() => { StorageService.save(STORAGE_KEYS.LOANS, loans); }, [loans]);
+  useEffect(() => { StorageService.save(STORAGE_KEYS.TRANSACTIONS, transactions); }, [transactions]);
+  useEffect(() => { StorageService.save(STORAGE_KEYS.COMMUNICATION_LOGS, communicationLogs); }, [communicationLogs]);
+  useEffect(() => { StorageService.save('contribution_history', contributionHistory); }, [contributionHistory]);
 
   // -- Notification Helper --
   const notify = (message: string, type: 'success' | 'error' | 'info' = 'success') => {
@@ -807,27 +803,158 @@ export default function App() {
       );
   };
 
-  const SystemView = () => (
-    <div className="space-y-6 animate-in fade-in">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-2"><Clock size={20} className="text-purple-500"/> Task Automation</h3>
-                <div className="space-y-4 mt-4">
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                        <div><div className="font-bold text-slate-700 text-sm">Nightly Renewal Check</div></div>
-                        <button onClick={handleRunAutomation} className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700">Run Now</button>
-                    </div>
-                </div>
-            </div>
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-2"><Activity size={20} className="text-emerald-500"/> System Health</h3>
-                <div className="flex items-center gap-2 p-3 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium mt-4">
-                    <CheckCircle size={16}/> All systems operational.
-                </div>
-            </div>
-        </div>
-    </div>
-  );
+  const handleExportData = () => {
+    const allData = {
+      members,
+      loans,
+      transactions,
+      communicationLogs,
+      contributionHistory,
+      exportDate: new Date().toISOString(),
+      version: '2.0'
+    };
+    
+    const dataStr = JSON.stringify(allData, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `millionaires-club-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    notify('Data exported successfully!', 'success');
+  };
+
+  const handleImportData = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const importedData = JSON.parse(e.target?.result as string);
+        
+        if (importedData.members) setMembers(importedData.members);
+        if (importedData.loans) setLoans(importedData.loans);
+        if (importedData.transactions) setTransactions(importedData.transactions);
+        if (importedData.communicationLogs) setCommunicationLogs(importedData.communicationLogs);
+        if (importedData.contributionHistory) setContributionHistory(importedData.contributionHistory);
+        
+        notify('Data imported successfully!', 'success');
+      } catch (error) {
+        notify('Error importing data. Please check the file format.', 'error');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+  };
+
+  const handleClearAllData = () => {
+    if (window.confirm('⚠️ WARNING: This will delete ALL data permanently. Are you sure?')) {
+      if (window.confirm('This action cannot be undone. Export a backup first! Continue?')) {
+        StorageService.clearAll();
+        setMembers(INITIAL_MEMBERS);
+        setLoans([]);
+        setTransactions([]);
+        setCommunicationLogs([]);
+        setContributionHistory(CONTRIBUTION_HISTORY_DB);
+        notify('All data cleared', 'info');
+      }
+    }
+  };
+
+  const SystemView = () => {
+    const dataSize = new Blob([JSON.stringify({ members, loans, transactions })]).size;
+    const dataSizeKB = (dataSize / 1024).toFixed(2);
+    const lastSync = StorageService.load(STORAGE_KEYS.LAST_SYNC, null);
+
+    return (
+      <div className="space-y-6 animate-in fade-in">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-2"><Clock size={20} className="text-purple-500"/> Task Automation</h3>
+                  <div className="space-y-4 mt-4">
+                      <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
+                          <div><div className="font-bold text-slate-700 text-sm">Nightly Renewal Check</div></div>
+                          <button onClick={handleRunAutomation} className="px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-bold hover:bg-purple-700">Run Now</button>
+                      </div>
+                  </div>
+              </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                  <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-2"><Activity size={20} className="text-emerald-500"/> System Health</h3>
+                  <div className="space-y-3 mt-4">
+                      <div className="flex items-center gap-2 p-3 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium">
+                          <CheckCircle size={16}/> All systems operational
+                      </div>
+                      <div className="text-xs text-slate-500 space-y-1">
+                          <div className="flex justify-between"><span>Data Size:</span><span className="font-mono font-bold">{dataSizeKB} KB</span></div>
+                          <div className="flex justify-between"><span>Members:</span><span className="font-bold">{members.length}</span></div>
+                          <div className="flex justify-between"><span>Active Loans:</span><span className="font-bold">{loans.filter(l => l.status === 'ACTIVE').length}</span></div>
+                          <div className="flex justify-between"><span>Transactions:</span><span className="font-bold">{transactions.length}</span></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          {/* Data Management */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+              <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                  <Download size={20} className="text-blue-500"/> Data Management
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <button 
+                      onClick={handleExportData}
+                      className="flex flex-col items-center gap-2 p-4 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 rounded-xl transition-all group"
+                  >
+                      <Download size={24} className="text-blue-600 group-hover:scale-110 transition-transform"/>
+                      <div className="text-center">
+                          <div className="font-bold text-blue-900 text-sm">Export Backup</div>
+                          <div className="text-xs text-blue-600 mt-1">Download all data as JSON</div>
+                      </div>
+                  </button>
+
+                  <label className="flex flex-col items-center gap-2 p-4 bg-emerald-50 hover:bg-emerald-100 border-2 border-emerald-200 rounded-xl transition-all cursor-pointer group">
+                      <Upload size={24} className="text-emerald-600 group-hover:scale-110 transition-transform"/>
+                      <div className="text-center">
+                          <div className="font-bold text-emerald-900 text-sm">Import Backup</div>
+                          <div className="text-xs text-emerald-600 mt-1">Restore from JSON file</div>
+                      </div>
+                      <input 
+                          type="file" 
+                          accept=".json"
+                          onChange={handleImportData}
+                          className="hidden"
+                      />
+                  </label>
+
+                  <button 
+                      onClick={handleClearAllData}
+                      className="flex flex-col items-center gap-2 p-4 bg-red-50 hover:bg-red-100 border-2 border-red-200 rounded-xl transition-all group"
+                  >
+                      <Trash2 size={24} className="text-red-600 group-hover:scale-110 transition-transform"/>
+                      <div className="text-center">
+                          <div className="font-bold text-red-900 text-sm">Clear All Data</div>
+                          <div className="text-xs text-red-600 mt-1">Reset to defaults</div>
+                      </div>
+                  </button>
+              </div>
+              
+              <div className="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                  <div className="flex items-start gap-2 text-xs text-slate-600">
+                      <AlertCircle size={14} className="mt-0.5 flex-shrink-0"/>
+                      <div>
+                          <strong>Data Storage:</strong> All data is stored locally in your browser's LocalStorage. 
+                          Export regular backups to prevent data loss. Data persists across browser sessions.
+                          {lastSync && <div className="mt-1 text-slate-500">Last saved: {formatDateTime(lastSync)}</div>}
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    );
+  };
 
   const BatchUploadModal = () => {
     const [csvText, setCsvText] = useState('');
@@ -1085,9 +1212,15 @@ export default function App() {
           </header>
 
           <div className="flex-1 p-4 md:p-10 overflow-y-auto">
-              <header className="mb-6 hidden md:block">
-              <h2 className="text-3xl font-bold text-slate-800 capitalize tracking-tight">{activeTab}</h2>
-              <p className="text-slate-500 mt-1">Manage your community portfolio efficiently.</p>
+              <header className="mb-6 hidden md:flex justify-between items-center">
+                <div>
+                  <h2 className="text-3xl font-bold text-slate-800 capitalize tracking-tight">{activeTab}</h2>
+                  <p className="text-slate-500 mt-1">Manage your community portfolio efficiently.</p>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  <span>Auto-saving to browser</span>
+                </div>
               </header>
               
               {activeTab === 'dashboard' && <DashboardComponent members={members} loans={loans} transactions={transactions} setActiveTab={setActiveTab} />}
