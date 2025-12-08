@@ -179,7 +179,7 @@ const ContributionsComponent: React.FC<ContributionsProps> = ({ members, setMemb
                       <option value="Mangpi">Mangpi</option>
                       <option value="Muan">Muan</option>
                       <option value="John Tuang">John Tuang</option>
-                      <option value="Admin">Admin</option>
+                      <option value="Bank">Bank</option>
                   </select>
               </div>
           </div>
