@@ -509,9 +509,9 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
 
       return (
         <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-            <div className="bg-white w-full max-w-4xl h-[90vh] rounded-xl shadow-2xl flex flex-col animate-in fade-in zoom-in-95">
-                <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-xl">
-                    <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2"><Calendar size={20} className="text-blue-600"/> Loan Payment Schedule</h3>
+            <div className={`${cardClass} w-full max-w-4xl h-[90vh] rounded-xl shadow-2xl flex flex-col animate-in fade-in zoom-in-95`}>
+                <div className={`p-4 border-b ${isDark ? 'border-slate-700' : 'border-slate-200'} flex justify-between items-center ${bgHeader} rounded-t-xl`}>
+                    <h3 className={`font-bold text-lg ${textPrimary} flex items-center gap-2`}><Calendar size={20} className="text-blue-600"/> Loan Payment Schedule</h3>
                     <div className="flex gap-2">
                         <button onClick={handlePrint} className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
                             <Printer size={16}/> Print PDF
@@ -519,8 +519,8 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
                         <button onClick={() => setScheduleLoan(null)} className="p-2 hover:bg-slate-200 rounded-full text-slate-500"><X size={20}/></button>
                     </div>
                 </div>
-                <div className="flex-1 overflow-y-auto p-8 bg-slate-100">
-                    <div id="print-schedule" className="bg-white p-8 max-w-3xl mx-auto shadow-sm border border-slate-200">
+                <div className={`flex-1 overflow-y-auto p-8 ${isDark ? 'bg-slate-900' : 'bg-slate-100'}`}>
+                    <div id="print-schedule" className={`${cardClass} p-8 max-w-3xl mx-auto shadow-sm`}>
                         <div className="header-bar bg-blue-500 text-white text-center font-bold text-2xl py-2 mb-6">Loan Payment</div>
                         <div className="flex justify-between items-start mb-6">
                              <div className="w-1/2">
@@ -609,10 +609,10 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
       {/* Repayment Modal */}
       {repaymentLoan && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-             <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in-95">
+             <div className={`${cardClass} w-full max-w-sm rounded-2xl shadow-2xl p-6 animate-in fade-in zoom-in-95`}>
                  <div className="flex justify-between items-center mb-4">
-                     <h3 className="font-bold text-lg text-slate-800">Record Repayment</h3>
-                     <button onClick={() => setRepaymentLoan(null)}><X size={20} className="text-slate-400 hover:text-slate-600"/></button>
+                     <h3 className={`font-bold text-lg ${textPrimary}`}>Record Repayment</h3>
+                     <button onClick={() => setRepaymentLoan(null)}><X size={20} className={`${textSecondary} hover:${textPrimary}`}/></button>
                  </div>
                  
                  {(() => {
@@ -633,18 +633,18 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
                                  </div>
                              )}
 
-                             <div className="mb-4 bg-slate-50 p-3 rounded-lg border border-slate-100 space-y-2">
+                             <div className={`mb-4 ${bgHeader} p-3 rounded-lg border ${isDark ? 'border-slate-700' : 'border-slate-100'} space-y-2`}>
                                  <div className="flex justify-between items-center">
-                                     <span className="text-xs font-bold text-slate-500 uppercase">Current Balance</span>
+                                     <span className={`text-xs font-bold ${textSecondary} uppercase`}>Current Balance</span>
                                      <span className="text-lg font-bold text-blue-600">${repaymentLoan.remainingBalance.toLocaleString()}</span>
                                  </div>
                                  <div className="flex justify-between items-center">
-                                     <span className="text-xs text-slate-500">Min. Monthly Payment</span>
-                                     <span className="text-sm font-medium text-slate-700">${monthlyPayment.toFixed(2)}</span>
+                                     <span className={`text-xs ${textSecondary}`}>Min. Monthly Payment</span>
+                                     <span className={`text-sm font-medium ${textPrimary}`}>${monthlyPayment.toFixed(2)}</span>
                                  </div>
                                  <div className="flex justify-between items-center">
-                                     <span className="text-xs text-slate-500">Due Date</span>
-                                     <span className={`text-sm font-medium ${isLate ? 'text-red-600 font-bold' : 'text-slate-700'}`}>
+                                     <span className={`text-xs ${textSecondary}`}>Due Date</span>
+                                     <span className={`text-sm font-medium ${isLate ? 'text-red-600 font-bold' : textPrimary}`}>
                                          {dueDate.toLocaleDateString()}
                                      </span>
                                  </div>
@@ -655,13 +655,13 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
 
                  <form onSubmit={handleRepaySubmit} className="space-y-4">
                      <div>
-                         <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Repayment Amount</label>
+                         <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Repayment Amount</label>
                          <div className="relative">
-                             <DollarSign size={16} className="absolute left-3 top-3 text-slate-400" />
+                             <DollarSign size={16} className={`absolute left-3 top-3 ${textSecondary}`} />
                              <input 
                                 type="number" 
                                 autoFocus
-                                className="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                className={`${inputClass} w-full pl-9 pr-3 py-2.5 border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500`}
                                 placeholder="0.00"
                                 value={repayAmount}
                                 onChange={(e) => setRepayAmount(e.target.value)}
@@ -674,9 +674,9 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
 
                      <div className="grid grid-cols-2 gap-3">
                          <div>
-                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Method</label>
+                             <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Method</label>
                              <select 
-                               className="w-full p-2 border border-slate-200 rounded-lg text-sm"
+                               className={`${inputClass} w-full p-2 border rounded-lg text-sm`}
                                value={repayMethod}
                                onChange={(e) => setRepayMethod(e.target.value)}
                              >
@@ -688,9 +688,9 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
                              </select>
                          </div>
                          <div>
-                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Received By</label>
+                             <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Received By</label>
                              <select 
-                               className="w-full p-2 border border-slate-200 rounded-lg text-sm bg-white"
+                               className={`${inputClass} w-full p-2 border rounded-lg text-sm`}
                                value={repayReceivedBy}
                                onChange={(e) => setRepayReceivedBy(e.target.value)}
                              >
@@ -713,19 +713,19 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
       {/* Rest of the component: New Loan Form, Recent Repayments, Active Loans */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Create Loan Form */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-          <h3 className="font-bold text-lg mb-4 text-slate-800 flex items-center gap-2">
+        <div className={`${cardClass} p-6 rounded-2xl shadow-sm`}>
+          <h3 className={`font-bold text-lg mb-4 ${textPrimary} flex items-center gap-2`}>
             <CreditCard size={20} className="text-blue-600"/> New Loan Application
           </h3>
           <form onSubmit={createLoan} className="space-y-4">
             
             {/* Searchable Borrower Select */}
             <div className="relative" ref={dropdownRef}>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Borrower</label>
+              <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Borrower</label>
               <div className="relative">
                 <input 
                   type="text"
-                  className={`w-full pl-10 pr-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${!borrowerId ? 'border-slate-200' : 'border-blue-500 bg-blue-50/30'}`}
+                  className={`${inputClass} w-full pl-10 pr-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${!borrowerId ? '' : 'border-blue-500 !bg-blue-500/10'}`}
                   placeholder="Search member name or ID..."
                   value={borrowerSearch}
                   onChange={(e) => {
@@ -741,23 +741,23 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
 
               {/* Dropdown List */}
               {isDropdownOpen && (
-                <div className="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                <div className={`absolute z-20 w-full mt-1 ${cardClass} rounded-xl shadow-xl max-h-60 overflow-y-auto`}>
                   {filteredMembers.length > 0 ? (
                     filteredMembers.map(m => (
                       <div 
                         key={m.id} 
-                        className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex justify-between items-center border-b border-slate-50 last:border-0"
+                        className={`px-4 py-3 ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-50'} cursor-pointer flex justify-between items-center border-b ${isDark ? 'border-slate-700' : 'border-slate-50'} last:border-0`}
                         onClick={() => handleSelectBorrower(m)}
                       >
                         <div>
-                          <div className="font-bold text-slate-700">{m.name}</div>
-                          <div className="text-xs text-slate-400">{m.id}</div>
+                          <div className={`font-bold ${textPrimary}`}>{m.name}</div>
+                          <div className={`text-xs ${textSecondary}`}>{m.id}</div>
                         </div>
                         {borrowerId === m.id && <Check size={16} className="text-blue-600" />}
                       </div>
                     ))
                   ) : (
-                    <div className="p-4 text-center text-slate-400 text-sm">No eligible members found.</div>
+                    <div className={`p-4 text-center ${textSecondary} text-sm`}>No eligible members found.</div>
                   )}
                 </div>
               )}
@@ -769,7 +769,7 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
               <div className="relative">
                 <input 
                   type="text"
-                  className={`w-full pl-10 pr-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 ${!cosignerId ? 'border-slate-200' : 'border-purple-500 bg-purple-50/30'}`}
+                  className={`${inputClass} w-full pl-10 pr-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 ${!cosignerId ? '' : 'border-purple-500 !bg-purple-500/10'}`}
                   placeholder="Search cosigner name or ID..."
                   value={cosignerSearch}
                   onChange={(e) => {
@@ -787,17 +787,17 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
 
               {/* Cosigner Dropdown List */}
               {isCosignerDropdownOpen && (
-                <div className="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                <div className={`absolute z-20 w-full mt-1 ${cardClass} rounded-xl shadow-xl max-h-60 overflow-y-auto`}>
                   {filteredCosigners.length > 0 ? (
                     filteredCosigners.map(m => (
                       <div 
                         key={m.id} 
-                        className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex justify-between items-center border-b border-slate-50 last:border-0"
+                        className={`px-4 py-3 ${isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-50'} cursor-pointer flex justify-between items-center border-b ${isDark ? 'border-slate-700' : 'border-slate-50'} last:border-0`}
                         onClick={() => handleSelectCosigner(m)}
                       >
                         <div>
-                          <div className="font-bold text-slate-700">{m.name}</div>
-                          <div className="text-xs text-slate-400">{m.id}</div>
+                          <div className={`font-bold ${textPrimary}`}>{m.name}</div>
+                          <div className={`text-xs ${textSecondary}`}>{m.id}</div>
                         </div>
                         {cosignerId === m.id && <Check size={16} className="text-purple-600" />}
                       </div>
@@ -834,8 +834,8 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
               />
             </div>
              <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Term</label>
-              <select className="w-full p-3 border border-slate-200 rounded-xl bg-white" value={term} onChange={e => setTerm(Number(e.target.value))}>
+              <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Term</label>
+              <select className={`${inputClass} w-full p-3 border rounded-xl`} value={term} onChange={e => setTerm(Number(e.target.value))}>
                 <option value={12}>12 Months</option>
                 <option value={24}>24 Months</option>
               </select>
@@ -844,9 +844,9 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
             {/* Disbursal Details */}
             <div className="grid grid-cols-2 gap-3">
                 <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Disbursal Method</label>
+                    <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Disbursal Method</label>
                     <select 
-                        className="w-full p-3 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className={`${inputClass} w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
                         value={disbursalMethod}
                         onChange={(e) => setDisbursalMethod(e.target.value)}
                     >
@@ -857,9 +857,9 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
                     </select>
                 </div>
                 <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Issued By</label>
+                    <label className={`block text-xs font-bold ${textSecondary} uppercase mb-1`}>Issued By</label>
                     <select 
-                        className="w-full p-3 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className={`${inputClass} w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
                         value={issuedBy}
                         onChange={(e) => setIssuedBy(e.target.value)}
                     >
@@ -873,10 +873,10 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
             </div>
 
             {loanAmount && !isNaN(parseFloat(loanAmount)) && (
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <div className={`${bgHeader} p-4 rounded-xl border ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
                     <div className="flex justify-between items-center text-sm mb-2">
-                        <span className="text-slate-600 font-medium">Application Fee:</span>
-                        <span className="font-bold text-slate-800">${calculateApplicationFee(parseFloat(loanAmount), term)}</span>
+                        <span className={`${textSecondary} font-medium`}>Application Fee:</span>
+                        <span className={`font-bold ${textPrimary}`}>${calculateApplicationFee(parseFloat(loanAmount), term)}</span>
                     </div>
                     
                     <div className="flex flex-col gap-2 mb-3">
@@ -890,12 +890,12 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
                                 className="text-blue-600 focus:ring-blue-500"
                             />
                             <div className="flex-1">
-                                <span className="text-sm font-bold text-slate-700 block">Pay Upfront</span>
-                                <span className="text-[10px] text-slate-500">Collect fee via cash/check now</span>
+                                <span className={`text-sm font-bold ${textPrimary} block`}>Pay Upfront</span>
+                                <span className={`text-[10px] ${textSecondary}`}>Collect fee via cash/check now</span>
                             </div>
-                            <Wallet size={16} className="text-slate-400"/>
+                            <Wallet size={16} className={textSecondary}/>
                         </label>
-                        <label className="flex items-center gap-3 p-2 border border-slate-200 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                        <label className={`flex items-center gap-3 p-2 border ${isDark ? 'border-slate-700 hover:bg-slate-700' : 'border-slate-200 hover:bg-white'} rounded-lg cursor-pointer transition-colors`}>
                             <input 
                                 type="radio" 
                                 name="feeType" 
@@ -905,14 +905,14 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
                                 className="text-blue-600 focus:ring-blue-500"
                             />
                             <div className="flex-1">
-                                <span className="text-sm font-bold text-slate-700 block">Add to Principal</span>
-                                <span className="text-[10px] text-slate-500">Roll fee into loan balance</span>
+                                <span className={`text-sm font-bold ${textPrimary} block`}>Add to Principal</span>
+                                <span className={`text-[10px] ${textSecondary}`}>Roll fee into loan balance</span>
                             </div>
                             <FileText size={16} className="text-slate-400"/>
                         </label>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-200 flex justify-between items-center">
+                    <div className={`pt-2 border-t ${isDark ? 'border-slate-700' : 'border-slate-200'} flex justify-between items-center`}>
                         <span className="text-xs font-bold text-blue-600 uppercase">Monthly Payment</span>
                         <span className="text-lg font-bold text-blue-700">
                             ${((parseFloat(loanAmount) + (feeType === 'capitalized' ? calculateApplicationFee(parseFloat(loanAmount), term) : 0)) / term).toFixed(2)}
@@ -932,59 +932,59 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
         </div>
         
         {/* Recent Repayments List */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col">
-           <h4 className="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
+        <div className={`${cardClass} p-6 rounded-2xl shadow-sm flex flex-col`}>
+           <h4 className={`font-bold text-lg ${textPrimary} mb-4 flex items-center gap-2`}>
               <History size={20} className="text-emerald-600"/> Recent Repayments
            </h4>
            <div className="flex-1 overflow-auto">
              <table className="w-full text-sm text-left">
-               <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-100">
+               <thead className={`${bgHeader} ${textSecondary} font-semibold border-b ${isDark ? 'border-slate-700' : 'border-slate-100'}`}>
                  <tr>
                    <th className="px-3 py-2">Date</th>
                    <th className="px-3 py-2">Borrower</th>
                    <th className="px-3 py-2 text-right">Amount</th>
                  </tr>
                </thead>
-               <tbody className="divide-y divide-slate-100">
+               <tbody className={`divide-y ${isDark ? 'divide-slate-700' : 'divide-slate-100'}`}>
                  {recentRepayments.map(t => {
                    const borrower = members.find(m => m.id === t.memberId);
                    return (
-                     <tr key={t.id} className="hover:bg-slate-50">
-                       <td className="px-3 py-2 text-slate-500">
+                     <tr key={t.id} className={isDark ? 'hover:bg-slate-700' : 'hover:bg-slate-50'}>
+                       <td className={`px-3 py-2 ${textSecondary}`}>
                            {new Date(t.date).toLocaleDateString()}
-                           <div className="text-[10px] text-slate-400">Via {t.paymentMethod}</div>
+                           <div className={`text-[10px] ${textSecondary}`}>Via {t.paymentMethod}</div>
                        </td>
-                       <td className="px-3 py-2 font-medium text-slate-800">{borrower?.name || t.memberId}</td>
+                       <td className={`px-3 py-2 font-medium ${textPrimary}`}>{borrower?.name || t.memberId}</td>
                        <td className="px-3 py-2 text-right font-bold text-emerald-600">${t.amount.toLocaleString()}</td>
                      </tr>
                    );
                  })}
                  {recentRepayments.length === 0 && (
-                   <tr><td colSpan={3} className="px-3 py-8 text-center text-slate-400 italic">No repayments recorded yet.</td></tr>
+                   <tr><td colSpan={3} className={`px-3 py-8 text-center ${textSecondary} italic`}>No repayments recorded yet.</td></tr>
                  )}
                </tbody>
              </table>
            </div>
-           <div className="mt-4 pt-3 border-t border-slate-100 flex justify-between items-end">
-             <div className="text-xs text-slate-400">Total Active Loans</div>
-             <div className="text-xl font-bold text-slate-800">${loans.filter(l => l.status === 'ACTIVE').reduce((acc, curr) => acc + curr.remainingBalance, 0).toLocaleString()}</div>
+           <div className={`mt-4 pt-3 border-t ${isDark ? 'border-slate-700' : 'border-slate-100'} flex justify-between items-end`}>
+             <div className={`text-xs ${textSecondary}`}>Total Active Loans</div>
+             <div className={`text-xl font-bold ${textPrimary}`}>${loans.filter(l => l.status === 'ACTIVE').reduce((acc, curr) => acc + curr.remainingBalance, 0).toLocaleString()}</div>
            </div>
         </div>
       </div>
 
       {/* Active Loans List */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <h3 className="font-bold text-lg mb-4 text-slate-800">Active Loans</h3>
+      <div className={`${cardClass} p-6 rounded-2xl shadow-sm`}>
+        <h3 className={`font-bold text-lg mb-4 ${textPrimary}`}>Active Loans</h3>
         <div className="space-y-4">
           {loans.filter(l => l.status === 'ACTIVE').map(loan => {
             const borrower = members.find(m => m.id === loan.borrowerId);
             return (
-              <div key={loan.id} className="border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 hover:border-blue-200 transition-colors">
+              <div key={loan.id} className={`border ${isDark ? 'border-slate-700 hover:border-blue-600' : 'border-slate-200 hover:border-blue-200'} rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 transition-colors`}>
                  <div className="flex-1">
-                   <h4 className="font-bold text-slate-800">{borrower?.name} <span className="text-slate-400 font-normal text-sm">({loan.borrowerId})</span></h4>
-                   <div className="text-sm text-slate-500 mt-2 flex flex-wrap gap-2 items-center">
-                     <span className="bg-slate-50 px-2 py-1 rounded border border-slate-100">Started: {new Date(loan.startDate).toLocaleDateString()}</span>
-                     <span className="bg-slate-50 px-2 py-1 rounded border border-slate-100">Term: {loan.termMonths}mo</span>
+                   <h4 className={`font-bold ${textPrimary}`}>{borrower?.name} <span className={`${textSecondary} font-normal text-sm`}>({loan.borrowerId})</span></h4>
+                   <div className={`text-sm ${textSecondary} mt-2 flex flex-wrap gap-2 items-center`}>
+                     <span className={`${bgHeader} px-2 py-1 rounded border ${isDark ? 'border-slate-700' : 'border-slate-100'}`}>Started: {new Date(loan.startDate).toLocaleDateString()}</span>
+                     <span className={`${bgHeader} px-2 py-1 rounded border ${isDark ? 'border-slate-700' : 'border-slate-100'}`}>Term: {loan.termMonths}mo</span>
                      <span className="flex items-center gap-1.5 font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded border border-amber-100">
                        <Clock size={12}/> Next Due: {new Date(loan.nextPaymentDue).toLocaleDateString()}
                      </span>
@@ -996,14 +996,14 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
                    </div>
                  </div>
                  <div className="text-right">
-                    <p className="text-xs text-slate-500 uppercase font-bold">Balance</p>
+                    <p className={`text-xs ${textSecondary} uppercase font-bold`}>Balance</p>
                     <p className="text-xl font-bold text-blue-600">${loan.remainingBalance.toLocaleString()}</p>
-                    <p className="text-xs text-slate-400">of ${loan.originalAmount.toLocaleString()}</p>
+                    <p className={`text-xs ${textSecondary}`}>of ${loan.originalAmount.toLocaleString()}</p>
                  </div>
                  <div className="flex gap-2">
                     <button 
                       onClick={() => printLoanAgreement(loan)}
-                      className="px-3 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-sm font-bold hover:bg-slate-200 transition-colors flex items-center gap-2"
+                      className={`px-3 py-2 ${bgHeader} ${textPrimary} border ${isDark ? 'border-slate-700 hover:bg-slate-700' : 'border-slate-200 hover:bg-slate-200'} rounded-lg text-sm font-bold transition-colors flex items-center gap-2`}
                       title="Print Loan Agreement"
                     >
                       <FileSignature size={14} /> Contract
@@ -1028,7 +1028,7 @@ const LoansComponent: React.FC<LoansProps> = ({ members, setMembers, loans, setL
             );
           })}
           {loans.filter(l => l.status === 'ACTIVE').length === 0 && (
-             <p className="text-slate-400 italic text-center py-8">No active loans.</p>
+             <p className={`${textSecondary} italic text-center py-8`}>No active loans.</p>
           )}
         </div>
       </div>
