@@ -918,9 +918,195 @@ export default function App() {
     const dataSize = new Blob([JSON.stringify({ members, loans, transactions })]).size;
     const dataSizeKB = (dataSize / 1024).toFixed(2);
     const lastSync = StorageService.load(STORAGE_KEYS.LAST_SYNC, null);
+    
+    // Bulk Member Editor State
+    const [showBulkEditor, setShowBulkEditor] = useState(false);
+    const [editableMembers, setEditableMembers] = useState<Member[]>([]);
+    const [filterStatus, setFilterStatus] = useState<'all' | 'Active' | 'Inactive'>('Active');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [hasChanges, setHasChanges] = useState(false);
+    
+    const startBulkEdit = () => {
+        setEditableMembers([...members]);
+        setShowBulkEditor(true);
+        setHasChanges(false);
+    };
+    
+    const handleBulkMemberChange = (id: string, field: keyof Member, value: string | number) => {
+        setEditableMembers(prev => prev.map(m => 
+            m.id === id ? { ...m, [field]: value } : m
+        ));
+        setHasChanges(true);
+    };
+    
+    const saveBulkChanges = () => {
+        setMembers(editableMembers);
+        notify(`Updated ${editableMembers.length} members successfully!`);
+        setHasChanges(false);
+    };
+    
+    const filteredEditableMembers = editableMembers
+        .filter(m => filterStatus === 'all' || m.accountStatus === filterStatus)
+        .filter(m => m.name.toLowerCase().includes(searchTerm.toLowerCase()) || m.id.includes(searchTerm));
 
     return (
       <div className="space-y-6 animate-in fade-in">
+          {/* Bulk Member Editor Modal */}
+          {showBulkEditor && (
+              <div className="fixed inset-0 z-[80] bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+                  <div className="bg-white w-full max-w-6xl h-[90vh] rounded-2xl shadow-2xl flex flex-col">
+                      <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+                          <div>
+                              <h3 className="font-bold text-lg text-slate-800">Bulk Member Editor</h3>
+                              <p className="text-xs text-slate-500">Edit member data directly. Changes are saved when you click "Save All Changes".</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                              {hasChanges && <span className="text-xs text-amber-600 font-bold">● Unsaved changes</span>}
+                              <button onClick={() => setShowBulkEditor(false)} className="p-2 hover:bg-slate-200 rounded-lg"><X size={20}/></button>
+                          </div>
+                      </div>
+                      
+                      {/* Filters */}
+                      <div className="p-4 border-b border-slate-100 flex flex-wrap gap-4 items-center">
+                          <div className="flex-1 min-w-[200px]">
+                              <input 
+                                  type="text" 
+                                  placeholder="Search by name or ID..." 
+                                  value={searchTerm}
+                                  onChange={(e) => setSearchTerm(e.target.value)}
+                                  className="w-full p-2 border border-slate-200 rounded-lg text-sm"
+                              />
+                          </div>
+                          <div className="flex gap-2">
+                              <button 
+                                  onClick={() => setFilterStatus('Active')}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${filterStatus === 'Active' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+                              >Active ({editableMembers.filter(m => m.accountStatus === 'Active').length})</button>
+                              <button 
+                                  onClick={() => setFilterStatus('Inactive')}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${filterStatus === 'Inactive' ? 'bg-slate-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+                              >Inactive ({editableMembers.filter(m => m.accountStatus === 'Inactive').length})</button>
+                              <button 
+                                  onClick={() => setFilterStatus('all')}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${filterStatus === 'all' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+                              >All ({editableMembers.length})</button>
+                          </div>
+                      </div>
+                      
+                      {/* Table */}
+                      <div className="flex-1 overflow-auto p-4">
+                          <table className="w-full text-sm border-collapse">
+                              <thead className="bg-slate-100 sticky top-0">
+                                  <tr>
+                                      <th className="p-2 text-left text-xs font-bold text-slate-600 border-b">ID</th>
+                                      <th className="p-2 text-left text-xs font-bold text-slate-600 border-b">Name</th>
+                                      <th className="p-2 text-left text-xs font-bold text-slate-600 border-b">Beneficiary</th>
+                                      <th className="p-2 text-left text-xs font-bold text-slate-600 border-b">Join Date</th>
+                                      <th className="p-2 text-left text-xs font-bold text-slate-600 border-b">Total Contrib.</th>
+                                      <th className="p-2 text-left text-xs font-bold text-slate-600 border-b">Phone</th>
+                                      <th className="p-2 text-left text-xs font-bold text-slate-600 border-b">Status</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  {filteredEditableMembers.map((m, idx) => (
+                                      <tr key={m.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
+                                          <td className="p-2 border-b border-slate-100 font-mono text-xs text-slate-500">{m.id}</td>
+                                          <td className="p-2 border-b border-slate-100">
+                                              <input 
+                                                  type="text" 
+                                                  value={m.name}
+                                                  onChange={(e) => handleBulkMemberChange(m.id, 'name', e.target.value)}
+                                                  className="w-full p-1 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                                              />
+                                          </td>
+                                          <td className="p-2 border-b border-slate-100">
+                                              <input 
+                                                  type="text" 
+                                                  value={m.beneficiary}
+                                                  onChange={(e) => handleBulkMemberChange(m.id, 'beneficiary', e.target.value)}
+                                                  className="w-full p-1 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                                              />
+                                          </td>
+                                          <td className="p-2 border-b border-slate-100">
+                                              <input 
+                                                  type="date" 
+                                                  value={m.joinDate}
+                                                  onChange={(e) => handleBulkMemberChange(m.id, 'joinDate', e.target.value)}
+                                                  className="w-full p-1 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                                              />
+                                          </td>
+                                          <td className="p-2 border-b border-slate-100">
+                                              <input 
+                                                  type="number" 
+                                                  value={m.totalContribution}
+                                                  onChange={(e) => handleBulkMemberChange(m.id, 'totalContribution', parseFloat(e.target.value) || 0)}
+                                                  className="w-24 p-1 border border-slate-200 rounded text-sm font-mono focus:ring-2 focus:ring-emerald-500 outline-none"
+                                              />
+                                          </td>
+                                          <td className="p-2 border-b border-slate-100">
+                                              <input 
+                                                  type="text" 
+                                                  value={m.phone}
+                                                  onChange={(e) => handleBulkMemberChange(m.id, 'phone', e.target.value)}
+                                                  className="w-full p-1 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                                                  placeholder="Phone"
+                                              />
+                                          </td>
+                                          <td className="p-2 border-b border-slate-100">
+                                              <select 
+                                                  value={m.accountStatus}
+                                                  onChange={(e) => handleBulkMemberChange(m.id, 'accountStatus', e.target.value)}
+                                                  className={`p-1 border rounded text-xs font-bold ${m.accountStatus === 'Active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}
+                                              >
+                                                  <option value="Active">Active</option>
+                                                  <option value="Inactive">Inactive</option>
+                                              </select>
+                                          </td>
+                                      </tr>
+                                  ))}
+                              </tbody>
+                          </table>
+                      </div>
+                      
+                      {/* Footer */}
+                      <div className="p-4 border-t border-slate-200 flex justify-between items-center bg-slate-50 rounded-b-2xl">
+                          <div className="text-xs text-slate-500">
+                              Showing {filteredEditableMembers.length} of {editableMembers.length} members
+                          </div>
+                          <div className="flex gap-3">
+                              <button 
+                                  onClick={() => setShowBulkEditor(false)}
+                                  className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-slate-200"
+                              >Cancel</button>
+                              <button 
+                                  onClick={saveBulkChanges}
+                                  disabled={!hasChanges}
+                                  className={`px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2 ${hasChanges ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}
+                              >
+                                  <Save size={16}/> Save All Changes
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          )}
+          
+          {/* Bulk Editor Button Card */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 rounded-2xl shadow-lg text-white">
+              <div className="flex justify-between items-center">
+                  <div>
+                      <h3 className="font-bold text-lg flex items-center gap-2"><Edit2 size={20}/> Bulk Member Editor</h3>
+                      <p className="text-blue-100 text-sm mt-1">Update names, join dates, contributions, and beneficiaries for all members at once.</p>
+                  </div>
+                  <button 
+                      onClick={startBulkEdit}
+                      className="px-6 py-3 bg-white text-blue-600 rounded-xl font-bold hover:bg-blue-50 transition-colors shadow-lg"
+                  >
+                      Open Editor
+                  </button>
+              </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                   <h3 className="font-bold text-slate-800 mb-2 flex items-center gap-2"><Clock size={20} className="text-purple-500"/> Task Automation</h3>
