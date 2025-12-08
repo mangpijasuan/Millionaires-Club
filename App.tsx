@@ -5,7 +5,7 @@ import {
   Search, Filter, Save, ChevronRight, Download, Upload, PieChart,
   TrendingUp, BarChart3, Clock, Settings, Shield, LogOut, Bell,
   Activity, Sparkles, Loader, Lock, Key, Heart, Printer, Calculator, Menu,
-  ShieldCheck, ArrowRight
+  ShieldCheck, ArrowRight, DollarSign, CreditCard, RefreshCw
 } from 'lucide-react';
 import { Member, Loan, Transaction, CommunicationLog, YearlyContribution } from './types';
 import { CONTRIBUTIONS_DB, INITIAL_MEMBERS, CONTRIBUTION_HISTORY_DB } from './constants';
