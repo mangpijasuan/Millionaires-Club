@@ -7,8 +7,6 @@ A comprehensive community fund management system with member portals, loan track
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF)](https://vitejs.dev/)
 
-View your app in AI Studio: https://ai.studio/apps/drive/1rkhEr530dUCEoxVdwIIsWAPTygKzKVCh
-
 ## ✨ Features
 
 ### 📊 Dashboard
