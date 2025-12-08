@@ -276,6 +276,8 @@ const INITIAL_MEMBERS_RAW = [
 
 export const INITIAL_MEMBERS: Member[] = INITIAL_MEMBERS_RAW.map(m => ({
   ...m,
+  nickname: m.beneficiary, // Use the beneficiary field as nickname
+  beneficiary: '', // Clear actual beneficiary - to be set by member
   email: `${m.name.split(' ')[0].toLowerCase()}@example.com`,
   activeLoanId: null, 
   lastLoanPaidDate: null,

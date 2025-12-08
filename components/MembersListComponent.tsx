@@ -21,7 +21,8 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
 
   const filteredMembers = members.filter(m => {
     const matchesSearch = m.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          m.id.toLowerCase().includes(searchTerm.toLowerCase());
+                          m.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (m.nickname && m.nickname.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesStatus = statusFilter === 'All' || m.accountStatus === statusFilter;
     
@@ -147,7 +148,8 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
             <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-4">ID</th>
-                <th className="px-6 py-4">Name</th>
+                <th className="px-6 py-4">Legal Name</th>
+                <th className="px-6 py-4">Nickname</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Contact Info</th>
                 <th className="px-6 py-4">Total Contribution</th>
@@ -166,6 +168,9 @@ const MembersListComponent: React.FC<MembersListProps> = ({ members, setEditingM
                       </div>
                       <span className="font-medium text-slate-800">{member.name}</span>
                     </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-slate-600 italic">{member.nickname || '-'}</span>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${

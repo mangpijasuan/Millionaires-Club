@@ -20,6 +20,7 @@ export interface MemberProfile {
 export interface Member {
   id: string;
   name: string;
+  nickname: string;
   email: string;
   joinDate: string;
   accountStatus: 'Active' | 'Inactive';
