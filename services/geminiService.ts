@@ -1,8 +1,15 @@
+
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.API_KEY || "YOUR_API_KEY_HERE"; // Ensure API_KEY is set in environment
-
 export const callGemini = async (prompt: string): Promise<string> => {
+  // SECURITY FIX: Strictly use environment variable. Do not add fallbacks here.
+  const apiKey = process.env.API_KEY;
+
+  if (!apiKey) {
+    console.error("Gemini API Key is missing. AI features will be disabled.");
+    return "AI Service Unavailable: API Key missing.";
+  }
+
   try {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({

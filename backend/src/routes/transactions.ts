@@ -1,40 +1,42 @@
-import { Router } from 'express';
-import pool from '../config/database';
-import { authenticate, requireAdmin, AuthRequest } from '../middleware/auth';
+import express from 'express';
+import { query } from '../config/database';
+import { authenticateToken, requireAdmin } from '../middleware/auth';
 
-const router = Router();
-router.use(authenticate);
+const router = express.Router();
 
 // Get all transactions
-router.get('/', requireAdmin, async (req: AuthRequest, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT t.*, m.name as member_name
-      FROM transactions t
-      LEFT JOIN members m ON t.member_id = m.id
-      ORDER BY t.date DESC
-    `);
-    res.json({ transactions: result.rows });
-  } catch (error: any) {
-    res.status(500).json({ error: 'Failed to get transactions' });
+    const result = await query('SELECT * FROM transactions ORDER BY date DESC');
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
-// Create transaction
-router.post('/', requireAdmin, async (req: AuthRequest, res) => {
+// Create Contribution (or manual transaction)
+router.post('/', authenticateToken, requireAdmin, async (req, res) => {
+  const { member_id, type, amount, description, payment_method, received_by } = req.body;
+
   try {
-    const { member_id, type, amount, description, payment_method, received_by } = req.body;
-    
-    const result = await pool.query(
-      `INSERT INTO transactions (member_id, type, amount, date, description, payment_method, received_by, status)
-       VALUES ($1, $2, $3, CURRENT_TIMESTAMP, $4, $5, $6, 'completed')
-       RETURNING *`,
+    const result = await query(
+      `INSERT INTO transactions (member_id, type, amount, description, payment_method, received_by)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [member_id, type, amount, description, payment_method, received_by]
     );
 
-    res.status(201).json({ transaction: result.rows[0] });
-  } catch (error: any) {
-    res.status(500).json({ error: 'Failed to create transaction' });
+    // If it's a contribution, update member total
+    if (type === 'CONTRIBUTION') {
+        await query(
+            `UPDATE members SET total_contribution = total_contribution + $1 WHERE id = $2`,
+            [amount, member_id]
+        );
+    }
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error creating transaction' });
   }
 });
 

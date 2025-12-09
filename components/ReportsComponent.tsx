@@ -7,19 +7,11 @@ interface ReportsProps {
   members: Member[];
   loans: Loan[];
   transactions: Transaction[];
-  isDark?: boolean;
 }
 
-const ReportsComponent: React.FC<ReportsProps> = ({ members, loans, transactions, isDark = false }) => {
+const ReportsComponent: React.FC<ReportsProps> = ({ members, loans, transactions }) => {
   const [reportType, setReportType] = useState<'financial' | 'member'>('financial');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  
-  // Theme classes
-  const cardClass = isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
-  const inputClass = isDark ? 'bg-slate-900 border-slate-700 text-white placeholder-slate-500' : 'bg-white border-slate-200 text-slate-900 placeholder-slate-400';
-  const textPrimary = isDark ? 'text-white' : 'text-slate-800';
-  const textSecondary = isDark ? 'text-slate-400' : 'text-slate-500';
-  const bgHeader = isDark ? 'bg-slate-900' : 'bg-slate-50';
   
   // Member Search State
   const [selectedMemberId, setSelectedMemberId] = useState('');
@@ -240,24 +232,24 @@ const ReportsComponent: React.FC<ReportsProps> = ({ members, loans, transactions
 
   return (
     <div className="space-y-6 animate-in fade-in">
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-100 pb-4">
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-slate-100 dark:border-slate-700 pb-4">
             <div>
-                <h3 className="font-bold text-xl text-slate-800 flex items-center gap-2">
-                    <Printer size={24} className="text-blue-600"/> Report Center
+                <h3 className="font-bold text-xl text-slate-800 dark:text-white flex items-center gap-2">
+                    <Printer size={24} className="text-blue-600 dark:text-blue-400"/> Report Center
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">Generate and print PDF statements and financial summaries.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Generate and print PDF statements and financial summaries.</p>
             </div>
-            <div className="flex bg-slate-100 p-1 rounded-lg">
+            <div className="flex bg-slate-100 dark:bg-slate-700 p-1 rounded-lg">
                 <button 
                     onClick={() => setReportType('financial')}
-                    className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${reportType === 'financial' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${reportType === 'financial' ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-300 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                 >
                     Financial Reports
                 </button>
                 <button 
                     onClick={() => setReportType('member')}
-                    className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${reportType === 'member' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`px-4 py-2 rounded-md text-sm font-bold transition-colors ${reportType === 'member' ? 'bg-white dark:bg-slate-600 text-blue-600 dark:text-blue-300 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                 >
                     Member Statements
                 </button>
@@ -267,35 +259,35 @@ const ReportsComponent: React.FC<ReportsProps> = ({ members, loans, transactions
         <div className="min-h-[300px]">
             {reportType === 'financial' ? (
                 <div className="max-w-2xl">
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Select Fiscal Year</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Select Fiscal Year</label>
                     <div className="flex gap-4 items-center">
                         <select 
                             value={selectedYear} 
                             onChange={(e) => setSelectedYear(Number(e.target.value))}
-                            className="p-3 border border-slate-200 rounded-xl bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 w-40 font-bold text-slate-700"
+                            className="p-3 border border-slate-200 dark:border-slate-600 rounded-xl bg-slate-50 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-40 font-bold text-slate-700 dark:text-white"
                         >
                             {[2023, 2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
                         </select>
                         <button 
                             onClick={printFinancialReport}
-                            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                            className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200 dark:shadow-none"
                         >
                             <Printer size={18}/> Generate Annual Report
                         </button>
                     </div>
                     
-                    <div className="mt-8 p-4 bg-slate-50 rounded-xl border border-slate-200">
-                        <h4 className="font-bold text-slate-700 mb-2 text-sm">Preview: {selectedYear} Summary</h4>
+                    <div className="mt-8 p-4 bg-slate-50 dark:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-600">
+                        <h4 className="font-bold text-slate-700 dark:text-slate-200 mb-2 text-sm">Preview: {selectedYear} Summary</h4>
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-white p-3 rounded border border-slate-100">
+                            <div className="bg-white dark:bg-slate-800 p-3 rounded border border-slate-100 dark:border-slate-600">
                                 <div className="text-xs text-slate-400">Total Inflow</div>
-                                <div className="text-lg font-bold text-emerald-600">
+                                <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
                                     ${generateFinancialData().reduce((acc, curr) => acc + curr.contributions + curr.repayments + curr.fees, 0).toLocaleString()}
                                 </div>
                             </div>
-                            <div className="bg-white p-3 rounded border border-slate-100">
+                            <div className="bg-white dark:bg-slate-800 p-3 rounded border border-slate-100 dark:border-slate-600">
                                 <div className="text-xs text-slate-400">Total Outflow (Loans)</div>
-                                <div className="text-lg font-bold text-red-500">
+                                <div className="text-lg font-bold text-red-500 dark:text-red-400">
                                     ${generateFinancialData().reduce((acc, curr) => acc + curr.loansIssued, 0).toLocaleString()}
                                 </div>
                             </div>
@@ -304,14 +296,14 @@ const ReportsComponent: React.FC<ReportsProps> = ({ members, loans, transactions
                 </div>
             ) : (
                 <div className="max-w-2xl">
-                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Select Member</label>
+                    <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Select Member</label>
                     
                     {/* Searchable Dropdown */}
                     <div className="relative mb-4" ref={dropdownRef}>
                         <div className="relative">
                             <input 
                                 type="text"
-                                className={`w-full pl-10 pr-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 ${!selectedMemberId ? 'border-slate-200' : 'border-blue-500 bg-blue-50/30'}`}
+                                className={`w-full pl-10 pr-10 p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-slate-900 dark:text-white ${!selectedMemberId ? 'border-slate-200 dark:border-slate-600' : 'border-blue-500 bg-blue-50/30 dark:bg-blue-900/30'}`}
                                 placeholder="Search member name or ID..."
                                 value={searchTerm}
                                 onChange={(e) => {
@@ -326,19 +318,19 @@ const ReportsComponent: React.FC<ReportsProps> = ({ members, loans, transactions
                         </div>
 
                         {isDropdownOpen && (
-                            <div className="absolute z-20 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                            <div className="absolute z-20 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 rounded-xl shadow-xl max-h-60 overflow-y-auto">
                                 {filteredMembers.length > 0 ? (
                                     filteredMembers.map(m => (
                                         <div 
                                             key={m.id} 
-                                            className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex justify-between items-center border-b border-slate-50 last:border-0"
+                                            className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer flex justify-between items-center border-b border-slate-50 dark:border-slate-700 last:border-0"
                                             onClick={() => handleSelectMember(m)}
                                         >
                                             <div>
-                                                <div className="font-bold text-slate-700">{m.name}</div>
+                                                <div className="font-bold text-slate-700 dark:text-slate-200">{m.name}</div>
                                                 <div className="text-xs text-slate-400">{m.id}</div>
                                             </div>
-                                            {selectedMemberId === m.id && <Check size={16} className="text-blue-600" />}
+                                            {selectedMemberId === m.id && <Check size={16} className="text-blue-600 dark:text-blue-400" />}
                                         </div>
                                     ))
                                 ) : (
@@ -351,7 +343,7 @@ const ReportsComponent: React.FC<ReportsProps> = ({ members, loans, transactions
                     <button 
                         onClick={printMemberStatement}
                         disabled={!selectedMemberId}
-                        className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200 dark:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <FileText size={18}/> Generate Statement PDF
                     </button>
